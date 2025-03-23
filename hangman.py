@@ -179,3 +179,35 @@ requests>=2.28
 OPENAI_KEY = "your_openai_key"
 FIREBASE_CONFIG = "{...}"  # Paste your Firebase service account config
 """
+
+
+# Replace old OpenAI imports with new structure
+from openai import OpenAI
+
+# Initialize client with your API key (update in your secrets)
+client = OpenAI(api_key=st.secrets["OPENAI_KEY"])
+
+# Update all ChatGPT completion calls from this:
+# OLD VERSION (0.28)
+# response = openai.ChatCompletion.create(
+#     model="gpt-3.5-turbo",
+#     messages=[...]
+# )
+
+# TO THIS NEW VERSION (1.0+)
+@st.cache_data(ttl=300)
+def get_ai_content(prompt, max_retries=3):
+    for _ in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            st.error(f"AI service error: {str(e)}")
+            time.sleep(2)
+    return "Temporary hint unavailable. Try guessing letters!"
+
+# Update your requirements.txt to specify:
+openai>=1.0
