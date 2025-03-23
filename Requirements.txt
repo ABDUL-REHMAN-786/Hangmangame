@@ -1,0 +1,5 @@
+streamlit>=1.22
+openai>=1.0
+firebase-admin>=6.1
+python-dotenv>=0.19
+requests>=2.28
